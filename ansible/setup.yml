@@ -1,0 +1,49 @@
+---
+- name: Configure Docker and Nginx server
+  hosts: managed
+  become: true
+
+  tasks:
+
+    - name: Update apt package cache
+      ansible.builtin.apt:
+        update_cache: true
+        cache_valid_time: 3600
+
+    - name: Upgrade installed packages
+      ansible.builtin.apt:
+        upgrade: dist
+
+    - name: Install Docker
+      ansible.builtin.apt:
+        name: docker.io
+        state: present
+
+    - name: Start and enable Docker
+      ansible.builtin.systemd:
+        name: docker
+        state: started
+        enabled: true
+
+    - name: Pull Nginx image
+      ansible.builtin.command:
+        cmd: docker pull nginx:latest
+      changed_when: true
+
+    - name: Run Nginx container
+      ansible.builtin.command:
+        cmd: docker run -d --name nginx-server --restart unless-stopped -p 80:80 nginx:latest
+      register: nginx_container
+      failed_when:
+        - nginx_container.rc != 0
+        - "'already in use' not in nginx_container.stderr"
+
+    - name: Check Docker containers
+      ansible.builtin.command:
+        cmd: docker ps
+      register: docker_status
+      changed_when: false
+
+    - name: Display Docker containers
+      ansible.builtin.debug:
+        var: docker_status.stdout

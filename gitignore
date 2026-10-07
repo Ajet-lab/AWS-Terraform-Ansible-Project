@@ -1,0 +1,30 @@
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+*.tfvars.json
+crash.log
+crash.*.log
+
+# Terraform lock file
+# Keep this file in Git
+# .terraform.lock.hcl
+
+# SSH private keys
+*.pem
+*.key
+id_rsa
+id_rsa.pub
+id_ed25519
+id_ed25519.pub
+
+# Ansible
+inventory.ini
+*.retry
+
+# OS / editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
